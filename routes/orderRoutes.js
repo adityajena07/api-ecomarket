@@ -9,7 +9,6 @@ const router = express.Router();
    1️⃣ BUY / PLACE ORDER
 ===================================================== */
 router.post("/buy", authMiddleware, async (req, res) => {
-
   try {
 
     const { productId } = req.body;
@@ -21,23 +20,18 @@ router.post("/buy", authMiddleware, async (req, res) => {
     }
 
     const order = await Order.create({
-
       productId: product._id,
       sellerId: product.sellerId,
       processingUnitId: req.user._id,
       status: "PLACED",
-
     });
 
     res.status(201).json(order);
 
   } catch (err) {
-
     console.error(err);
     res.status(500).json({ message: "Order creation failed" });
-
   }
-
 });
 
 
@@ -45,7 +39,6 @@ router.post("/buy", authMiddleware, async (req, res) => {
    2️⃣ MY ORDERS (Processing dashboard)
 ===================================================== */
 router.get("/my", authMiddleware, async (req, res) => {
-
   try {
 
     const orders = await Order.find({
@@ -58,19 +51,16 @@ router.get("/my", authMiddleware, async (req, res) => {
     res.json(orders);
 
   } catch (err) {
-
+    console.error(err);
     res.status(500).json({ message: "Failed to fetch orders" });
-
   }
-
 });
 
 
 /* =====================================================
-   3️⃣ ALL ORDERS
+   3️⃣ ALL ORDERS (CATEGORY FILTER)
 ===================================================== */
-router.get("/processing/orders", authMiddleware, async (req, res) => {
-
+router.get("/processing", authMiddleware, async (req, res) => {
   try {
 
     const user = req.user;
@@ -78,7 +68,7 @@ router.get("/processing/orders", authMiddleware, async (req, res) => {
     const orders = await Order.find()
       .populate({
         path: "productId",
-        match: { category: user.category }   // category filter
+        match: { category: user.category }
       })
       .populate("sellerId", "businessName")
       .sort({ createdAt: -1 });
@@ -88,11 +78,9 @@ router.get("/processing/orders", authMiddleware, async (req, res) => {
     res.json(filtered);
 
   } catch (err) {
-
+    console.error(err);
     res.status(500).json({ message: "Failed to fetch orders" });
-
   }
-
 });
 
 
@@ -100,15 +88,12 @@ router.get("/processing/orders", authMiddleware, async (req, res) => {
    4️⃣ REQUEST PICKUP
 ===================================================== */
 router.put("/request-pickup/:orderId", authMiddleware, async (req, res) => {
-
   try {
 
     const order = await Order.findByIdAndUpdate(
-
       req.params.orderId,
       { status: "ACCEPTED" },
       { new: true }
-
     );
 
     if (!order) {
@@ -122,11 +107,9 @@ router.put("/request-pickup/:orderId", authMiddleware, async (req, res) => {
     res.json(order);
 
   } catch (err) {
-
+    console.error(err);
     res.status(500).json({ message: "Failed to request pickup" });
-
   }
-
 });
 
 
@@ -134,15 +117,12 @@ router.put("/request-pickup/:orderId", authMiddleware, async (req, res) => {
    5️⃣ MARK PICKED
 ===================================================== */
 router.put("/picked/:orderId", authMiddleware, async (req, res) => {
-
   try {
 
     const order = await Order.findByIdAndUpdate(
-
       req.params.orderId,
       { status: "PICKED" },
       { new: true }
-
     );
 
     if (!order) {
@@ -156,11 +136,9 @@ router.put("/picked/:orderId", authMiddleware, async (req, res) => {
     res.json(order);
 
   } catch (err) {
-
+    console.error(err);
     res.status(500).json({ message: "Failed to mark picked" });
-
   }
-
 });
 
 
@@ -168,7 +146,6 @@ router.put("/picked/:orderId", authMiddleware, async (req, res) => {
    6️⃣ PROCESSING DASHBOARD STATS
 ===================================================== */
 router.get("/processing/stats", authMiddleware, async (req, res) => {
-
   try {
 
     const processingUnitId = req.user._id;
@@ -195,11 +172,9 @@ router.get("/processing/stats", authMiddleware, async (req, res) => {
     });
 
   } catch (err) {
-
+    console.error(err);
     res.status(500).json({ message: "Failed to fetch stats" });
-
   }
-
 });
 
 export default router;
